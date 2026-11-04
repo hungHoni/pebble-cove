@@ -1,0 +1,824 @@
+<title>Pebble Cove</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Fredoka:wght@500;600&family=Silkscreen&display=swap">
+<style>
+/* Layout: one calm reading column; each look is a wide picture beside its notes so it can be judged at size */
+:root{
+  --bg:#F2F5F3; --surface:#FFFFFF; --ink:#16252C; --muted:#53636A; --line:#D3DCD8; --line-strong:#9FB0AF;
+  --tide:#1D757C; --tide-soft:#DCEDEB; --sand:#EEDDBB; --sand-ink:#5E4720;
+  --f-display:"Fredoka","Avenir Next","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  --f-pixel:"Silkscreen","Courier New",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0E171B;--surface:#15222A;--ink:#E4ECEA;--muted:#98A9AD;--line:#26363D;--line-strong:#4A5E63;--tide:#5FC3C3;--tide-soft:#173438;--sand:#4A3D24;--sand-ink:#F0DDB4;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E171B;--surface:#15222A;--ink:#E4ECEA;--muted:#98A9AD;--line:#26363D;--line-strong:#4A5E63;--tide:#5FC3C3;--tide-soft:#173438;--sand:#4A3D24;--sand-ink:#F0DDB4;color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding-block:44px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:72px}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(48px,9vw,84px);font-weight:600;letter-spacing:-.01em;line-height:1}
+h2{font-size:clamp(26px,4vw,32px)}
+h3{font-size:22px}
+p{margin:0}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:24px}
+.intro{color:var(--muted);max-width:64ch;font-size:17px}
+
+/* hero */
+.hero{display:flex;flex-direction:column;gap:18px}
+.tideline{width:min(420px,100%);height:22px;color:var(--tide);display:block}
+.lede{font-size:clamp(18px,2.4vw,21px);max-width:58ch}
+.status{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;background:var(--sand);color:var(--sand-ink);font-weight:600;font-size:14px;line-height:1.4;padding:8px 16px;border-radius:16px}
+.status::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:currentColor}
+
+/* looks */
+.looks{display:flex;flex-direction:column;gap:40px}
+.look{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:28px;align-items:center}
+.look-notes{display:flex;flex-direction:column;gap:12px;min-width:0}
+.look-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.tag{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--tide);background:var(--tide-soft);padding:3px 10px;border-radius:999px}
+.tag-off{color:var(--muted);background:var(--line)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:4px 0 0;font-size:15px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0}
+@media (max-width:760px){.look{grid-template-columns:1fr;gap:16px}}
+
+.comp{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;container-type:inline-size;background:#9fc7c9}
+.comp canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;inset:0;padding:3cqw;display:flex;flex-direction:column;justify-content:space-between;font-size:clamp(9px,2.4cqw,13px);line-height:1.2;pointer-events:none}
+.hud-top{display:flex;justify-content:space-between;gap:2cqw}
+.bar{display:flex;justify-content:center;gap:2cqw}
+.pill{padding:.45em .9em;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:.45em;padding:.45em 1em .45em .45em;white-space:nowrap}
+.btn i{font-style:normal;display:inline-grid;place-items:center;width:1.55em;height:1.55em;font-size:.9em}
+.comp[data-style="paper"] .pill,.comp[data-style="paper"] .btn{background:#FFFCF4;color:#24353C;border-radius:999px;box-shadow:0 .2em 0 rgba(20,40,48,.28);font-family:var(--f-display);font-weight:500}
+.comp[data-style="paper"] .btn i{background:#2C7486;color:#FFFFFF;border-radius:50%}
+.comp[data-style="paint"] .pill,.comp[data-style="paint"] .btn{background:rgba(255,249,242,.85);color:#5B4652;border-radius:1.1em .9em 1.2em .8em;font-weight:600;box-shadow:0 .1em .7em rgba(90,60,70,.18)}
+.comp[data-style="paint"] .btn i{background:#E9BBA8;color:#5B4652;border-radius:45% 55% 50% 50%}
+.comp[data-style="pixel"] .pill,.comp[data-style="pixel"] .btn{background:#172A35;color:#F3E7C3;border:.16em solid #F3E7C3;box-shadow:.22em .22em 0 #0A1217;font-family:var(--f-pixel);font-size:.88em}
+.comp[data-style="pixel"] .btn i{background:#F3E7C3;color:#172A35}
+
+/* visit loop */
+.loop{list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding:0;margin:0}
+.loop li{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.loop li::before{content:counter(s);font:600 14px/1 var(--f-display);color:var(--tide);background:var(--tide-soft);width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+.loop b{font-family:var(--f-display);font-weight:500;font-size:18px}
+.loop span{color:var(--muted);font-size:15px}
+.loop-note{color:var(--muted);font-size:15px}
+@media (max-width:860px){.loop{grid-template-columns:1fr}}
+
+/* tables */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:15px}
+table.fit{min-width:0}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td:first-child{font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+kbd{font-family:var(--f-body);font-size:13px;font-weight:600;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--bg)}
+.aside{color:var(--muted);font-size:15px;max-width:64ch}
+
+/* diagram */
+.diagram{margin:0;display:flex;flex-direction:column;gap:12px}
+.diagram .scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px}
+.diagram svg{display:block;width:100%;min-width:600px;height:auto;color:var(--muted)}
+.diagram figcaption{color:var(--muted);font-size:15px;max-width:64ch}
+.d-box{fill:var(--bg);stroke:var(--line-strong);stroke-width:1}
+.d-hot{fill:var(--tide-soft);stroke:var(--tide);stroke-width:1}
+.d-group{fill:none;stroke:var(--line-strong);stroke-width:1;stroke-dasharray:5 4}
+.d-arr{fill:none;stroke:currentColor;stroke-width:1.2}
+.d-t{font:600 14px var(--f-body);fill:var(--ink)}
+.d-s{font:400 12px var(--f-body);fill:var(--muted)}
+
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.stack{margin:0;display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.stack dt{font-weight:600}
+.stack dd{margin:0;color:var(--muted)}
+
+/* plan, review, decisions */
+.plan{margin:0;padding:0;list-style:none;counter-reset:m;display:flex;flex-direction:column;border-left:2px solid var(--line);margin-left:14px}
+.plan li{counter-increment:m;position:relative;padding:0 0 22px 30px;display:flex;flex-direction:column;gap:4px}
+.plan li:last-child{padding-bottom:0}
+.plan li::before{content:counter(m);position:absolute;left:-15px;top:0;width:28px;height:28px;border-radius:50%;background:var(--bg);border:2px solid var(--tide);color:var(--tide);font:600 13px/24px var(--f-display);text-align:center}
+.plan b{font-family:var(--f-display);font-weight:500;font-size:19px;line-height:28px}
+.plan span{color:var(--muted);max-width:64ch}
+.changes{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.changes li{border-top:2px solid var(--tide);padding-top:10px;font-size:15px;color:var(--muted)}
+.changes b{color:var(--ink);font-weight:600}
+@media (max-width:640px){.changes{grid-template-columns:1fr}}
+.decide,.ways{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.decide li,.ways li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.decide b,.ways b{font-weight:600}
+.decide span,.ways span{color:var(--muted);font-size:15px}
+@media (max-width:640px){.decide,.ways{grid-template-columns:1fr}}
+.decide{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:860px){.decide{grid-template-columns:1fr}}
+.decide li.done{background:var(--tide-soft);border-color:var(--tide)}
+.decide li.done b{color:var(--tide)}
+.effort{font-style:normal;font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--tide);margin-top:4px}
+.thesis{font-family:var(--f-display);font-weight:500;font-size:clamp(22px,3.2vw,30px);line-height:1.3;max-width:32ch;color:var(--tide);text-wrap:balance}
+.phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.phases > div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.phases h3{font-size:19px}
+.phases ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:15px}
+@media (max-width:860px){.phases{grid-template-columns:1fr}}
+.phases.pair{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){.phases.pair{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--line);padding-top:24px;color:var(--muted);font-size:15px;max-width:72ch}
+</style>
+
+<main class="wrap">
+  <header class="hero">
+    <p class="eyebrow">Game design proposal · draft 10 · 4 Nov 2026</p>
+    <h1>Pebble Cove</h1>
+    <svg class="tideline" viewBox="0 0 420 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 C 35 2, 70 20, 105 11 S 175 2, 210 11 S 280 20, 315 11 S 385 2, 420 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <p class="thesis">A calm place to take a break, or to keep you company while you work, shared with real people.</p>
+    <p class="lede">A quiet beach in your browser, shared with up to 49 other people. Walk on the sand, wave, sit and watch the water, or add a stone to a cairn. Every 15 minutes the tide comes in and washes the cairns away, and everyone starts again on fresh sand.</p>
+    <p class="status">Step 1 is built. Next: test it on your iPhone and with five new players.</p>
+  </header>
+
+  <section aria-labelledby="looks-h">
+    <h2 id="looks-h">Pick a look</h2>
+    <p class="intro">The same stretch of beach at the same moment, drawn three ways. The waves move and the tide timer counts down. These are quick sketches made in code to compare styles, not finished art. You chose A, paper cut, on 4 Nov. B and C stay here for reference.</p>
+    <div class="looks">
+      <article class="look">
+        <div class="comp" data-style="paper" role="img" aria-label="Paper cut style: flat layered sea and sand with soft drop shadows, eight round characters, four stone cairns">
+          <canvas></canvas>
+          <div class="hud" aria-hidden="true">
+            <div class="hud-top"><span class="pill">Cove 12 · 38/50</span><span class="pill">Your stones <b>14</b> · tide in <span class="tide-time">6:12</span></span></div>
+            <div class="bar"><span class="btn"><i>1</i>Wave</span><span class="btn"><i>2</i>Sit</span><span class="btn"><i>3</i>Stack</span></div>
+          </div>
+        </div>
+        <div class="look-notes">
+          <div class="look-head"><h3>A. Paper cut</h3><span class="tag">Chosen</span></div>
+          <p>Flat sheets of colored paper, each with a soft shadow under it. Shapes stay simple, so the beach reads clearly on a small phone and every object can be drawn in code.</p>
+          <dl class="facts"><dt>Art effort</dt><dd>Low</dd><dt>On phones</dt><dd>Runs smoothly, even on old phones</dd><dt>Risk</dt><dd>Looks plain if the colors are dull</dd></dl>
+        </div>
+      </article>
+      <article class="look">
+        <div class="comp" data-style="paint" role="img" aria-label="Soft paint style: pastel sea and sand with brushy edges and paper grain, the same characters and cairns">
+          <canvas></canvas>
+          <div class="hud" aria-hidden="true">
+            <div class="hud-top"><span class="pill">Cove 12 · 38/50</span><span class="pill">Your stones <b>14</b> · tide in <span class="tide-time">6:12</span></span></div>
+            <div class="bar"><span class="btn"><i>1</i>Wave</span><span class="btn"><i>2</i>Sit</span><span class="btn"><i>3</i>Stack</span></div>
+          </div>
+        </div>
+        <div class="look-notes">
+          <div class="look-head"><h3>B. Soft paint</h3><span class="tag tag-off">Not chosen</span></div>
+          <p>Brushy edges, pastel color and a paper grain, like a picture book. The warmest of the three. It is also the slowest to make, because every new object needs hand-painted art to match.</p>
+          <dl class="facts"><dt>Art effort</dt><dd>High</dd><dt>On phones</dt><dd>Smooth on recent phones</dd><dt>Risk</dt><dd>Painted art is hard to keep consistent</dd></dl>
+        </div>
+      </article>
+      <article class="look">
+        <div class="comp" data-style="pixel" role="img" aria-label="Pixel style: a low-resolution pixel grid scaled up with crisp edges, the same characters and cairns">
+          <canvas></canvas>
+          <div class="hud" aria-hidden="true">
+            <div class="hud-top"><span class="pill">Cove 12 · 38/50</span><span class="pill">Yours 14 · tide <span class="tide-time">6:12</span></span></div>
+            <div class="bar"><span class="btn"><i>1</i>Wave</span><span class="btn"><i>2</i>Sit</span><span class="btn"><i>3</i>Stack</span></div>
+          </div>
+        </div>
+        <div class="look-notes">
+          <div class="look-head"><h3>C. Pixel</h3><span class="tag tag-off">Not chosen</span></div>
+          <p>A small pixel grid scaled up with crisp edges. Quick to make and very light to run, with a clear retro character. Faces and small details are hard to show at this size.</p>
+          <dl class="facts"><dt>Art effort</dt><dd>Low to medium</dd><dt>On phones</dt><dd>Runs smoothly, even on old phones</dd><dt>Risk</dt><dd>Pixel art is a crowded style</dd></dl>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="visit-h">
+    <h2 id="visit-h">How a visit goes</h2>
+    <ol class="loop">
+      <li><b>Arrive</b><span>No account and no install. Pick a color and a hat. On a first visit, a short hint shows the three buttons.</span></li>
+      <li><b>Choose a cove</b><span>Each cove shows its head count and its next tide. Or open a friend's cove link to join them.</span></li>
+      <li><b>Spend time</b><span>Walk, wave, sit and watch the water, or add a stone to a cairn. The beach is four screens wide and the camera follows you.</span></li>
+      <li><b>The tide comes in</b><span>Every 15 minutes, at a different time in each cove. You get a postcard of the beach as it was, then the water washes every cairn away.</span></li>
+      <li><b>Fresh sand</b><span>Your stone total and postcard album stay on this device. Stay for another tide or leave whenever you like.</span></li>
+    </ol>
+    <p class="loop-note">↻ Steps 3 to 5 repeat for as long as you stay.</p>
+    <p class="aside">Each cove runs one timetable, so events never overlap: the tide every 15 minutes, the great low tide once an hour between two tides, the whale once a day, and gusts at quiet moments. Cairns on the sandbar wash away with the next tide.</p>
+  </section>
+
+  <section id="wow" aria-labelledby="wow-h">
+    <h2 id="wow-h">Ideas to wow players</h2>
+    <p class="intro">Seven moments that make a quiet beach memorable. Each one works without chat, and none needs fast servers. The first is sketched below in the paper cut look.</p>
+    <article class="look">
+      <div class="comp" data-style="paper" data-moment="whale" role="img" aria-label="Paper cut preview: a whale surfaces and spouts as it swims past the cove, and people on the beach wave at it">
+        <canvas></canvas>
+        <div class="hud" aria-hidden="true">
+          <div class="hud-top"><span class="pill">Cove 12 · 38/50</span><span class="pill">A whale is passing every cove</span></div>
+          <div class="bar"><span class="btn"><i>1</i>Wave</span><span class="btn"><i>2</i>Sit</span><span class="btn"><i>3</i>Stack</span></div>
+        </div>
+      </div>
+      <div class="look-notes">
+        <div class="look-head"><h3>The whale passes</h3><span class="tag">Step 2</span></div>
+        <p>Once a day, at the same second, a whale swims past every cove. Everyone playing sees it together, all 100,000 if that's how many are on. People wave at it without being told to.</p>
+        <dl class="facts"><dt>Effort</dt><dd>Low: one shared clock and one animation</dd><dt>Why it works</dt><dd>It's the one moment the whole game shares</dd></dl>
+      </div>
+    </article>
+    <ul class="ways">
+      <li><b>The crowd wave</b><span>When five or more people on the same screen press Wave one after another, a stadium-style wave ripples across them, and the sea answers with a big breaker and a burst of spray.</span><em class="effort">Effort: low to medium</em></li>
+      <li><b>Stones that travel</b><span>When the tide takes a cairn, its stones wash up days later in another cove, still in the builder's color. Pick one up and it says where it came from: "Washed in from Cove 47."</span><em class="effort">Effort: medium</em></li>
+      <li><b>Cairns that sing</b><span>Every stone plays a soft note as it lands, tuned so any mix sounds good. Each cove slowly builds its own tune, and when the tide comes in it plays every cairn one last time, low to high.</span><em class="effort">Effort: low, sound made in the browser</em></li>
+      <li><b>The great low tide</b><span>Once an hour the sea pulls far back for two minutes, uncovering tidepools and a sandbar out to a small island. Everyone walks out together and hurries back before the water returns. Anyone the water catches floats gently back to shore.</span><em class="effort">Effort: low to medium, the same map with a lower water line</em></li>
+      <li><b>Living postcards</b><span>The tide postcard becomes a 10-second replay of the beach, stored as a few kilobytes of positions. A replay is saved only when you share it, kept for 90 days, and can be reported. Opening the link takes a friend straight to your cove.</span><em class="effort">Effort: medium</em></li>
+      <li><b>Hats in the wind</b><span>Now and then a gust blows across the cove and every hat on the beach lifts and tumbles along the sand. Players chase their own, and hats that land in the water float back on the next wave. Every screen works out the same hat paths, so gusts add no traffic, and only the owner can pick up their hat.</span><em class="effort">Effort: low</em></li>
+    </ul>
+    <p class="aside">On 4 Nov you chose all seven for the first release. The build plan shows which step each one arrives in.</p>
+  </section>
+
+  <section aria-labelledby="stay-h">
+    <h2 id="stay-h">Why people stay and come back</h2>
+    <p class="intro">Everything here supports the purpose at the top of this page, at a different timescale, from the next few minutes to the next season.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>When</th><th>Why stay or return</th><th>What the game does</th></tr></thead>
+        <tbody>
+          <tr><td>Right now</td><td>It's calm, and you're not alone</td><td>Waves, gulls and people nearby. One tide makes a natural 15-minute break: stay for one tide.</td></tr>
+          <tr><td>While you work</td><td>Quiet company in another tab</td><td>Sit, and your character watches the water while you work. A soft chime marks each tide, like a gentle focus timer.</td></tr>
+          <tr><td>Tomorrow</td><td>Something to see, and someone to see</td><td>The daily whale at the same time. The matchmaker puts you back in your usual cove, so the same regulars are there.</td></tr>
+          <tr><td>This month</td><td>Something to collect</td><td>Each tide washes up a few shells to find, and postcards fill an album. Every ten tides on the beach earns a new hat.</td></tr>
+          <tr><td>This season</td><td>Something to build together</td><td>Every stone anyone stacks adds to a lighthouse on the headland, rising in every cove at once. When it's finished, the season changes the beach.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="ways">
+      <li><b>Familiar faces</b><span>After you've waved with someone a few times, a small shell appears above them on your screen to mark a friendly face. There are no names and no chat, only the feeling of seeing a regular.</span></li>
+      <li><b>Nothing to lose</b><span>No streaks to break and no timers that punish you. Skip a week and the beach is still there, with your shells and postcards waiting.</span></li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="controls-h">
+    <h2 id="controls-h">Controls</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>Desktop</th><th>Phone</th></tr></thead>
+        <tbody>
+          <tr><td>Walk</td><td><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrow keys</td><td>Tap the sand where you want to go</td></tr>
+          <tr><td>Wave</td><td><kbd>1</kbd></td><td>Wave button</td></tr>
+          <tr><td>Sit and watch the water</td><td><kbd>2</kbd></td><td>Sit button</td></tr>
+          <tr><td>Add a stone</td><td><kbd>3</kbd> adds to the nearest cairn, or starts one on an empty spot</td><td>Stack button</td></tr>
+          <tr><td>Hide someone</td><td>Click them, then Hide</td><td>Tap them, then Hide</td></tr>
+          <tr><td>Sound</td><td><kbd>M</kbd> mutes waves and gulls</td><td>Speaker button</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="aside">There is no chat. People talk with waves and stones only, which keeps the cove calm and removes most of the work of keeping it friendly. You can still hide anyone you'd rather not see. Cairns go only on spaced-out spots, so stones can't spell words, and the matchmaker limits how many players can join from one address. Shared postcards can be reported, the cove cam runs a few minutes behind, and each player can only wave and stack so often.</p>
+  </section>
+
+  <section aria-labelledby="scale-h">
+    <h2 id="scale-h">Built for thousands at once</h2>
+    <p class="intro">Each cove runs on its own, on one server process. Only a few small, slow things are shared between coves: the whale's clock, travelling stones and the lighthouse total, all through Redis. So twice the players means twice the coves and twice the processes.</p>
+    <figure class="diagram">
+      <div class="scroll">
+        <svg viewBox="0 0 680 430" role="img" aria-label="Players load the game from a CDN, ask the matchmaker for a seat in a cove, then connect through a load balancer that routes by server ID to the process running that cove. Game servers keep room lists and head counts in Redis, which the matchmaker reads.">
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+          <rect class="d-box" x="50" y="40" width="580" height="56" rx="10"/>
+          <text class="d-t" x="340" y="64" text-anchor="middle">Players' browsers</text>
+          <text class="d-s" x="340" y="83" text-anchor="middle">Desktop and phone, no install</text>
+          <line class="d-arr" x1="140" y1="96" x2="140" y2="156" marker-end="url(#ah)"/>
+          <text class="d-s" x="150" y="130">1. Load the game</text>
+          <line class="d-arr" x1="340" y1="96" x2="340" y2="156" marker-end="url(#ah)"/>
+          <text class="d-s" x="350" y="130">2. Get a seat</text>
+          <line class="d-arr" x1="540" y1="96" x2="540" y2="156" marker-end="url(#ah)"/>
+          <text class="d-s" x="550" y="130">3. Connect</text>
+          <rect class="d-box" x="50" y="160" width="180" height="56" rx="10"/>
+          <text class="d-t" x="140" y="184" text-anchor="middle">CDN</text>
+          <text class="d-s" x="140" y="203" text-anchor="middle">Game files and art</text>
+          <rect class="d-box" x="250" y="160" width="180" height="56" rx="10"/>
+          <text class="d-t" x="340" y="184" text-anchor="middle">Matchmaker</text>
+          <text class="d-s" x="340" y="203" text-anchor="middle">Names cove and server</text>
+          <rect class="d-box" x="450" y="160" width="180" height="56" rx="10"/>
+          <text class="d-t" x="540" y="184" text-anchor="middle">Load balancer</text>
+          <text class="d-s" x="540" y="203" text-anchor="middle">Routes by server ID</text>
+          <path class="d-arr" d="M130 306 L130 240 L270 240 L270 220" marker-end="url(#ah)"/>
+          <text class="d-s" x="140" y="268">rooms and counts</text>
+          <line class="d-arr" x1="540" y1="216" x2="540" y2="266" marker-end="url(#ah)"/>
+          <text class="d-s" x="530" y="245" text-anchor="end">to that server</text>
+          <rect class="d-group" x="250" y="270" width="380" height="130" rx="12"/>
+          <text class="d-t" x="270" y="295">Game server processes</text>
+          <rect class="d-hot" x="270" y="308" width="100" height="56" rx="10"/>
+          <text class="d-t" x="320" y="332" text-anchor="middle">Process 1</text>
+          <text class="d-s" x="320" y="351" text-anchor="middle">Coves 1–20</text>
+          <rect class="d-hot" x="390" y="308" width="100" height="56" rx="10"/>
+          <text class="d-t" x="440" y="332" text-anchor="middle">Process 2</text>
+          <text class="d-s" x="440" y="351" text-anchor="middle">Coves 21–40</text>
+          <rect class="d-hot" x="510" y="308" width="100" height="56" rx="10"/>
+          <text class="d-t" x="560" y="332" text-anchor="middle">Process N</text>
+          <text class="d-s" x="560" y="351" text-anchor="middle">Coves 41+</text>
+          <text class="d-s" x="270" y="388">One CPU core each · up to 50 players per cove</text>
+          <rect class="d-box" x="50" y="308" width="160" height="56" rx="10"/>
+          <text class="d-t" x="130" y="332" text-anchor="middle">Redis</text>
+          <text class="d-s" x="130" y="351" text-anchor="middle">Rooms and counts</text>
+          <line class="d-arr" x1="212" y1="336" x2="248" y2="336" marker-start="url(#ah)" marker-end="url(#ah)"/>
+        </svg>
+      </div>
+      <figcaption>A player makes three trips. They download the game once. They ask the matchmaker for a seat, and it answers with a cove and the ID of the server process that runs it. Then they connect with that ID, and the load balancer passes the connection straight to that process. Processes keep room lists and head counts in Redis, so the matchmaker always knows which coves have space.</figcaption>
+    </figure>
+    <div class="two">
+      <div class="table-wrap">
+        <table class="fit">
+          <thead><tr><th>Sizing for 5,000 at once</th><th>Estimate</th></tr></thead>
+          <tbody>
+            <tr><td>Players per cove</td><td class="num">Up to 50, spread along a beach four screens wide</td></tr>
+            <tr><td>Server updates</td><td class="num">10 a second, sending only what changed. A player in a hidden tab gets only tide and whale updates.</td></tr>
+            <tr><td>Data to each player</td><td class="num">3–6 KB a second, including connection overhead</td></tr>
+            <tr><td>Players per process</td><td class="num">About 1,000 (20 coves) on one CPU core. Sending each player only the people near them costs extra CPU, so the bot test checks this number first.</td></tr>
+            <tr><td>Machines needed</td><td class="num">Two 4-core machines: 5 processes busy, 3 spare</td></tr>
+            <tr><td>Total data out at peak</td><td class="num">120–240 Mbit/s</td></tr>
+            <tr><td>Traffic cost</td><td class="num">At that peak all month, about 40–80 TB. On the big clouds that costs thousands of dollars a month, so use a host that includes traffic in the server price.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <dl class="stack">
+        <dt>In the browser</dt><dd>TypeScript and PixiJS, drawing the 2D beach</dd>
+        <dt>Game servers</dt><dd>Node.js and Colyseus, one room per cove, one process per CPU core</dd>
+        <dt>Matchmaking</dt><dd>Colyseus's built-in matchmaker, sharing room lists and head counts through Redis</dd>
+        <dt>Hosting</dt><dd>Game files on a CDN. Servers in Docker, on a host that includes traffic.</dd>
+        <dt>Saved data</dt><dd>No accounts. Travelling stones live in Redis with a daily backup. A postcard replay is saved only when someone shares it, in file storage that deletes it after 90 days. Your stone total and album stay in your browser.</dd>
+      </dl>
+    </div>
+    <p class="aside">These numbers are estimates. Step 4 of the build plan replaces them with measured ones from a test with 5,000 bot players.</p>
+    <h3 id="cost-h">Monthly cost at 100,000 players at once</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Per month</th><th>Budget host (Hetzner, EU)</th><th>Big cloud (AWS, on demand)</th></tr></thead>
+        <tbody>
+          <tr><td>Game servers</td><td class="num">17 machines × 8 vCPU: about €2,350</td><td class="num">17 machines × 8 vCPU: about $3,600</td></tr>
+          <tr><td>Matchmaker, Redis, load balancers</td><td class="num">About €140</td><td class="num">About $250</td></tr>
+          <tr><td>Player traffic, 300–600 TB</td><td class="num">Up to 510 TB included (30 TB per machine), extra beyond that</td><td class="num">$19,000–34,000</td></tr>
+          <tr><td>Game files on a CDN</td><td class="num">Cloudflare, $0–25</td><td class="num">Cloudflare, $0–25</td></tr>
+          <tr><td>Total</td><td class="num">About €2,500 (roughly $2,900), plus any extra traffic</td><td class="num">About $23,000–38,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="aside">This assumes 100,000 players at the busiest hour and 40,000 on average across the day, 3–6 KB a second each, and about 1,000 players per CPU. Hetzner prices are after its June 2026 increase. AWS uses its standard data tiers ($0.09 a GB falling to $0.05). Prices were checked on 3 Nov 2026 with third-party price trackers. Sending each player only the people near them on the beach, not the whole cove, should cut traffic by half or more, which matters most on a big cloud, where traffic is about 85% of the bill. If 100,000 is your total number of players rather than how many play at once, expect a few thousand online at peak: one or two machines, roughly €150–300 a month on a budget host.</p>
+  </section>
+
+  <section aria-labelledby="money-h">
+    <h2 id="money-h">Paying for it</h2>
+    <p class="intro">Pebble Cove stays free to play. Most visits don't overlap, so even a million visits a month is a small server bill, and a budget cap stops the bill from running away.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Visits a month</th><th>Online at once</th><th>Servers</th><th>Cost a month</th></tr></thead>
+        <tbody>
+          <tr><td class="num">100,000</td><td class="num">About 70, up to 300 at the busiest hour</td><td>1 small machine</td><td class="num">€10–45</td></tr>
+          <tr><td class="num">1 million</td><td class="num">About 700, up to 2,800</td><td>1 medium machine and 1 small one</td><td class="num">About €130</td></tr>
+          <tr><td class="num">10 million</td><td class="num">About 7,000, up to 28,000</td><td>4 large machines and 1 small one</td><td class="num">About €600</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="aside">This assumes visits of about 30 minutes, because people keep the cove open while they work, a busiest hour about 4 times the average, and Hetzner's EU prices after June 2026. A player in a hidden tab gets only tide and whale updates. At all three sizes, traffic stays inside the allowance included with each machine.</p>
+    <ul class="ways">
+      <li><b>Support the cove</b><span>A small button opens a page with a donation link. Supporters get a shell on their hat for a month, and nothing that changes play.</span></li>
+      <li><b>Hats and colors</b><span>Paid looks for $1–3 each, never anything that changes play. Buying needs a simple account or a restore code, so this comes after launch.</span></li>
+      <li><b>A budget cap</b><span>The matchmaker runs only as many coves as the month's budget pays for. When every cove is full, new visitors wait on a quiet shore until a spot opens. The whale runs on the clock, so it passes the waiting shore too.</span></li>
+      <li><b>Outside support</b><span>Arts grants, free cloud credits for new companies, or a sponsor who keeps one cove open with their name on the sign.</span></li>
+    </ul>
+    <p class="aside">A rough check: 1 million visits might come from about 300,000 people. If 1 in 1,000 of them gives €3, that's about €900 a month, around seven times the server bill at that size. The bigger cost is your own time for updates, support and keeping coves friendly, which no server bill shows.</p>
+  </section>
+
+  <section aria-labelledby="market-h">
+    <h2 id="market-h">Getting the word out</h2>
+    <p class="intro">The game markets itself in two ways: its moments make short, calm videos, and every postcard link drops a new person onto the beach. The plan spends time, not money.</p>
+    <div class="phases">
+      <div>
+        <h3>Before launch</h3>
+        <ul>
+          <li>A one-page site with a countdown to the first whale and an email sign-up.</li>
+          <li>Short clips while building, like the paper tide sliding in or a cairn singing as the water takes it. Posted to TikTok, Instagram Reels and YouTube Shorts.</li>
+          <li>A small Discord for testers, who become the first regulars.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Launch week</h3>
+        <ul>
+          <li>The first whale: one set time when everyone is invited to watch it together.</li>
+          <li>Posts on itch.io, Reddit (r/WebGames, r/CozyGamers), Hacker News and Product Hunt.</li>
+          <li>Notes to cozy-game newsletters and to streamers who run study streams. A stream mode hides the buttons for a clean view.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>After launch</h3>
+        <ul>
+          <li>A 24/7 cove cam on YouTube: the real beach with real players, as a background for studying. Viewers click through to join.</li>
+          <li>Each season and each finished lighthouse gives something new to post.</li>
+          <li>Early translations. The game has very little text, so Korean, Vietnamese, Japanese and Spanish versions are cheap.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>What to measure</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>Come back the next day</td><td class="num">1 in 4 players</td></tr>
+          <tr><td>Come back on day 7</td><td class="num">1 in 8 players</td></tr>
+          <tr><td>Average visit</td><td class="num">At least one tide (15 minutes)</td></tr>
+          <tr><td>New players who arrive from a postcard link</td><td class="num">1 in 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="aside">The only running cost is about €20–45 a month for a small machine that streams the cove cam. Paid ads wait until these targets are met, because ads can't fix a game people don't come back to.</p>
+  </section>
+
+  <section aria-labelledby="plan-h">
+    <h2 id="plan-h">Build plan, once you approve</h2>
+    <ol class="plan">
+      <li><b>One beach, one player · built 4 Nov</b><span>Walk, wave, sit and stack in paper cut, with the camera following you along the beach. Cairns that sing, hats in the wind and the sandbar for the great low tide arrive here, because they work without other people. Done when it feels calm and works in Safari on an iPhone.</span></li>
+      <li><b>One live cove</b><span>The server runs a cove for 50 players. Other people move smoothly, and the tide and postcard arrive for everyone at the same moment. The whale, the crowd wave and living postcards arrive here, because they need other people.</span></li>
+      <li><b>Many coves</b><span>Matchmaker, head counts, friend links, a clear message when a cove is full, and automatic reconnect when a phone drops its connection. Stones that travel arrive here, because they move between coves.</span></li>
+      <li><b>Bot test</b><span>5,000 bot players across 100 coves. Measure update time, CPU and data per player, then fix whatever is slow.</span></li>
+      <li><b>Soft launch</b><span>Deploy to one region with monitoring. Friends first, then a closed beta, then the public.</span></li>
+      <li><b>After launch</b><span>Shells and the album, hats earned by time on the beach, the lighthouse and seasons, familiar faces, the supporter shell, stream mode and the cove cam. Familiar faces and the supporter shell need a lasting player ID, the first step toward optional accounts.</span></li>
+    </ol>
+    <h3>Step 1 in detail</h3>
+    <div class="phases pair">
+      <div>
+        <h3>What step 1 includes</h3>
+        <ul>
+          <li>One beach, four screens wide, in paper cut, with the camera following you.</li>
+          <li>Pick a color and a hat, then walk, wave, sit and stack.</li>
+          <li>The 15-minute tide: the timer, the water rising and the cairns washing away.</li>
+          <li>A still postcard at each tide, saved to your album on this device.</li>
+          <li>Cairns that sing, hats in the wind, and the great low tide on the same map.</li>
+          <li>Game rules written apart from the drawing code, so the step 2 server can run the same rules.</li>
+          <li>A test hook for your iPhone play-test robot, so it can read the game and press its buttons.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Done when</h3>
+        <ul>
+          <li>It runs at 60 frames a second on your iPhone in Safari, and never below 30 on an older iPhone.</li>
+          <li>The first screen shows in under 3 seconds on 4G, and the whole game is under 2 MB.</li>
+          <li>It works upright and sideways, with more beach showing sideways.</li>
+          <li>Sound starts on the first tap, as iOS requires, and the mute setting is remembered.</li>
+          <li>Five people who haven't seen it each play one full tide, and at least four say it felt calm.</li>
+          <li>The play-test robot gets through a full tide on the iPhone without errors.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="review-h">
+    <h2 id="review-h">What the review changed</h2>
+    <p class="intro">Two independent reviews have read the design. The first read draft 1 and rated paper cut the strongest look. The second read draft 8, after the features were chosen. Everything both reviews raised is fixed in this draft.</p>
+    <h3>First review, draft 1</h3>
+    <ul class="changes">
+      <li><b>Routing.</b> Draft 1 kept each player on one server with the load balancer, and that server might not be running their cove. Now the matchmaker names the server, and the load balancer routes by its ID.</li>
+      <li><b>Data and cost.</b> The traffic estimate left out connection overhead and assumed only 20 people moving. It now gives a range and a monthly traffic figure.</li>
+      <li><b>Crowding.</b> 50 people on one screen isn't calm. Each cove is now a long beach, four screens wide, with a camera that follows you.</li>
+      <li><b>Reasons to come back.</b> A stone total kept on your device, a postcard at every tide, links to bring a friend into your cove, and a different tide time for each cove.</li>
+      <li><b>Safety.</b> No chat doesn't mean nothing to moderate. Added hiding a player, spaced-out cairn spots and a limit on joins from one address.</li>
+      <li><b>Drawing.</b> Your character is no longer behind the buttons, characters are bigger, seated people have faces, and the soft paint look is less see-through.</li>
+    </ul>
+    <h3>Second review, draft 8</h3>
+    <ul class="changes">
+      <li><b>Long visits.</b> Costs are redone for 30-minute visits, a hidden tab gets only tide and whale updates, and three wrong figures are corrected.</li>
+      <li><b>Budget and the whale.</b> The budget cap now follows the launch size, and the whale passes the waiting shore too.</li>
+      <li><b>Scope.</b> Extras the page promised but the plan left out are now listed under After launch.</li>
+      <li><b>One timetable.</b> Each cove runs one timetable, so tides, the low tide, the whale and gusts never overlap.</li>
+      <li><b>Postcards and abuse.</b> Replays are saved only when shared, kept 90 days and can be reported. The cove cam runs a few minutes behind.</li>
+      <li><b>Step 1.</b> Now written out in detail, with tests you can check.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="decide-h">
+    <h2 id="decide-h">Decisions for you</h2>
+    <ul class="decide">
+      <li class="done"><b>Purpose · decided 4 Nov</b><span>Lead with "a calm place to take a break, or to keep you company while you work."</span></li>
+      <li class="done"><b>Look · decided 4 Nov</b><span>A, paper cut.</span></li>
+      <li class="done"><b>Features · decided 4 Nov</b><span>All seven wow ideas, spread across build steps 1 to 3.</span></li>
+      <li><b>Name</b><span>Keep the working title Pebble Cove?</span></li>
+      <li><b>Talking</b><span>Gestures and stones only, with no chat?</span></li>
+      <li><b>Size</b><span>Aim for 5,000 players at once at launch?</span></li>
+      <li><b>Money</b><span>A donation button at launch, and paid hats later?</span></li>
+      <li><b>Budget cap</b><span>About €250 a month, enough for 5,000 at once?</span></li>
+      <li><b>Launch</b><span>Open with a first-whale event at one set time?</span></li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>The reference, Sansa Temple, is in the same genre: a quiet shared space with a few gestures, a personal counter and rooms with a cap. Pebble Cove has its own setting, characters and shared event (the tide). Nothing is taken from that game's name, art, places or music, and stacking stones here is play, with no wishes or prayers attached.</p>
+  </footer>
+</main>
+
+<script>
+(() => {
+  const W = 400, H = 225, TAU = Math.PI * 2, K = 1.6;
+  const rng = (seed) => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+
+  const scene = {
+    rocks: [{x:22,y:166,r:15},{x:378,y:112,r:19},{x:390,y:212,r:11}],
+    cairns: [{x:118,y:152,n:4},{x:306,y:178,n:3},{x:226,y:108,n:2},{x:60,y:210,n:3}],
+    people: [
+      {x:86,y:186,c:0,act:"wave"},
+      {x:160,y:122,c:1,act:"sit"},
+      {x:210,y:162,c:2,act:"walk",me:true},
+      {x:280,y:176,c:3,act:"stack"},
+      {x:338,y:132,c:4,act:"sit"},
+      {x:40,y:130,c:5,act:"walk"},
+      {x:356,y:202,c:6,act:"wave"},
+      {x:262,y:114,c:1,act:"sit"}
+    ],
+    steps: [[176,200],[182,193],[188,186],[194,179],[200,172]]
+  };
+  const items = [
+    ...scene.rocks.map(o => ({...o, kind:"rock"})),
+    ...scene.cairns.map(o => ({...o, kind:"cairn"})),
+    ...scene.people.map(o => ({...o, kind:"person"}))
+  ].sort((a, b) => a.y - b.y);
+
+  const shore = (x, t) => 68 + 7*Math.sin(x/38) + 4*Math.sin(x/17 + 1.3) + 2.5*Math.sin(t*0.7 + x/60);
+  const edge = (off, i, t) => {
+    const pts = [];
+    for (let x = -4; x <= W + 4; x += 4) {
+      const sway = off < 0 ? 2.2*Math.sin(t*1.1 + x/26 + i*1.7) : 1.2*Math.sin(x/23 + i);
+      pts.push([x, shore(x, off >= 14 ? 0 : t) + off + sway]);
+    }
+    return pts;
+  };
+  const fillBelow = (ctx, pts, color, dy = 0) => {
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1] + dy);
+    for (const p of pts) ctx.lineTo(p[0], p[1] + dy);
+    ctx.lineTo(W + 4, H + 4); ctx.lineTo(-4, H + 4); ctx.closePath();
+    ctx.fillStyle = color; ctx.fill();
+  };
+  const fillAbove = (ctx, pts, color, dy = 0) => {
+    ctx.beginPath(); ctx.moveTo(-4, -4);
+    for (const p of pts) ctx.lineTo(p[0], p[1] + dy);
+    ctx.lineTo(W + 4, -4); ctx.closePath();
+    ctx.fillStyle = color; ctx.fill();
+  };
+  const at = (ctx, x, y, k, fn) => { ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.translate(-x, -y); fn(); ctx.restore(); };
+  const dot = (ctx, x, y, r, color) => { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fillStyle = color; ctx.fill(); };
+  const oval = (ctx, x, y, rx, ry, color, rot = 0) => { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot, 0, TAU); ctx.fillStyle = color; ctx.fill(); };
+  const closedEyes = (ctx, x, y, color) => {
+    ctx.strokeStyle = color; ctx.lineWidth = 0.9; ctx.lineCap = "round";
+    for (const dx of [-2.8, 2.8]) { ctx.beginPath(); ctx.arc(x + dx, y - 0.6, 1.3, 0.15*Math.PI, 0.85*Math.PI); ctx.stroke(); }
+  };
+  const cairnStones = (c) => {
+    const out = []; let y = c.y, w = 13;
+    for (let i = 0; i < c.n; i++) {
+      const h = w * 0.46;
+      out.push({x: c.x + (i % 2 ? 1.2 : -1) * (i ? 1 : 0), y: y - h/2, rx: w/2, ry: h/2, i});
+      y -= h * 0.9; w *= 0.8;
+    }
+    return out;
+  };
+  const youLabel = (ctx, p, font) => {
+    ctx.font = font; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const w = ctx.measureText("you").width + 7, h = 9, x = p.x - w/2, y = p.y + 4.5;
+    ctx.beginPath();
+    ctx.moveTo(x + h/2, y); ctx.lineTo(x + w - h/2, y);
+    ctx.arc(x + w - h/2, y + h/2, h/2, -Math.PI/2, Math.PI/2);
+    ctx.lineTo(x + h/2, y + h);
+    ctx.arc(x + h/2, y + h/2, h/2, Math.PI/2, Math.PI*1.5);
+    ctx.closePath(); ctx.fillStyle = "rgba(22,37,44,.8)"; ctx.fill();
+    ctx.fillStyle = "#FFFFFF"; ctx.fillText("you", p.x, y + h/2 + 0.4);
+  };
+
+  /* A. Paper cut: water sheets lie on the sand, so every shadow falls down */
+  const BODY = ["#E9785B","#5B8FD9","#F2B544","#7FB77E","#B48AD6","#E88FB0","#4FA3A0"];
+  const HAT  = ["#2F4858","#F2D06B","#3A6EA5","#F4F1E6","#3F7F6B","#5B8FD9","#F6E3B4"];
+  const STONE = ["#8E989B","#B3B9BA","#7A8487","#A59E95"];
+  const sheet = (ctx, path, color) => {
+    ctx.save(); ctx.translate(1.4, 2.4); path(); ctx.fillStyle = "rgba(40,30,10,.22)"; ctx.fill(); ctx.restore();
+    path(); ctx.fillStyle = color; ctx.fill();
+  };
+  function whale(ctx, t) {
+    const tt = (t + 4.5) % 16; if (tt > 11) return false;
+    const x = -80 + tt / 11 * (W + 160), y = 46 + Math.sin(tt * 1.6) * 1.5;
+    oval(ctx, x, y + 2, 60, 5, "rgba(10,40,50,.3)");
+    sheet(ctx, () => { ctx.beginPath(); ctx.moveTo(x - 24, y - 11); ctx.lineTo(x - 14, y - 21); ctx.lineTo(x - 10, y - 11); ctx.closePath(); }, "#1F3140");
+    sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(x, y, 56, 12, 0, Math.PI, 0); ctx.closePath(); }, "#1F3140");
+    oval(ctx, x + 6, y - 7, 28, 2.8, "#3E5A6B");
+    ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = 1.4; ctx.lineCap = "round";
+    ctx.beginPath(); ctx.ellipse(x, y, 59, 3.4, 0, 0, Math.PI); ctx.stroke();
+    if (tt > 2 && tt < 6) {
+      const k = (tt - 2) / 4;
+      for (let i = 0; i < 5; i++) dot(ctx, x + 34 + (i % 2 ? 2 : -2) * k * 3, y - 15 - i * 3.4 * k - k * 4, 3.6 - i * 0.4, `rgba(255,255,255,${(0.95 - k * 0.6).toFixed(2)})`);
+    }
+    return x > -40 && x < W + 40;
+  }
+  function paper(ctx, t, c) {
+    ctx.fillStyle = "#ECD8B1"; ctx.fillRect(0, 0, W, H);
+    const r = rng(7);
+    for (let n = 0; n < 80; n++) oval(ctx, r()*W, 80 + r()*145, 1.2, 0.8, "rgba(120,90,40,.18)");
+    [[14,"#D8BF94"],[0,"#EEF5EF"],[-6,"#5EADB2"],[-16,"#3C90A0"],[-30,"#2C7486"]].forEach(([off, col], i) => {
+      const pts = edge(off, i, t);
+      fillAbove(ctx, pts, off >= 0 ? "rgba(110,75,25,.16)" : "rgba(12,45,55,.2)", 2.5);
+      fillAbove(ctx, pts, col);
+    });
+    for (const [x, y] of scene.steps) oval(ctx, x, y, 2.4, 1.3, "rgba(140,100,50,.35)");
+    const whaleOn = !!(c && c.el.dataset.moment === "whale" && whale(ctx, t));
+    for (const o of items) {
+      if (o.kind === "rock") {
+        sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(o.x, o.y, o.r, o.r*0.72, 0, 0, TAU); }, "#7E8A8C");
+        oval(ctx, o.x - o.r*0.25, o.y - o.r*0.22, o.r*0.55, o.r*0.35, "#9AA6A7", -0.3);
+      } else if (o.kind === "cairn") {
+        at(ctx, o.x, o.y, K, () => {
+          oval(ctx, o.x, o.y, 9, 3, "rgba(90,65,30,.25)");
+          for (const s of cairnStones(o)) {
+            sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(s.x, s.y, s.rx, s.ry, 0, 0, TAU); }, STONE[(s.i + o.n) % STONE.length]);
+            oval(ctx, s.x - s.rx*0.3, s.y - s.ry*0.35, s.rx*0.4, s.ry*0.3, "rgba(255,255,255,.25)");
+          }
+        });
+      } else at(ctx, o.x, o.y, K, () => paperPerson(ctx, whaleOn && o.act !== "sit" && !o.me ? {...o, act: "wave"} : o));
+    }
+  }
+  function paperPerson(ctx, p) {
+    const sit = p.act === "sit", rx = 8, ry = sit ? 7 : 10, by = p.y - (sit ? 7 : 11);
+    oval(ctx, p.x, p.y, 9, 3, "rgba(90,65,30,.25)");
+    if (p.me) { ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 1.1; ctx.setLineDash([2.5, 2]); ctx.beginPath(); ctx.ellipse(p.x, p.y, 13, 4.5, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]); }
+    if (p.act === "wave") sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(p.x + rx, by - ry + 2, 2.3, 4.2, 0.5, 0, TAU); }, BODY[p.c]);
+    sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(p.x, by, rx, ry, 0, 0, TAU); }, BODY[p.c]);
+    oval(ctx, p.x + 1.5, by + 3, rx*0.5, ry*0.45, "rgba(255,255,255,.2)");
+    const hy = by - ry + 3;
+    sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(p.x, hy, rx*0.8, 4.2, 0, Math.PI, 0); ctx.closePath(); }, HAT[p.c]);
+    dot(ctx, p.x, hy - 4.6, 1.9, HAT[p.c]);
+    if (sit) closedEyes(ctx, p.x, by - 1, "#22303A");
+    else { dot(ctx, p.x - 2.8, by - 1.5, 1.1, "#22303A"); dot(ctx, p.x + 2.8, by - 1.5, 1.1, "#22303A"); }
+    dot(ctx, p.x - 4.8, by + 1.4, 1.3, "rgba(232,110,110,.45)"); dot(ctx, p.x + 4.8, by + 1.4, 1.3, "rgba(232,110,110,.45)");
+    if (p.act === "wave") {
+      ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = 1.1; ctx.lineCap = "round";
+      for (const rr of [4, 7]) { ctx.beginPath(); ctx.arc(p.x + rx + 1, by - ry + 1, rr, -1.3, -0.3); ctx.stroke(); }
+    }
+    if (p.act === "stack") sheet(ctx, () => { ctx.beginPath(); ctx.ellipse(p.x + rx + 2.5, by + 1, 3.4, 2.3, 0, 0, TAU); }, "#9AA3A6");
+    if (p.me) youLabel(ctx, p, '600 7px "Fredoka", sans-serif');
+  }
+
+  /* B. Soft paint: a solid core under two brushy passes */
+  const SBODY = ["#E39780","#86A8DD","#EDC676","#9BC593","#BEA0DB","#E9A6BD","#88C1BD"];
+  const SHAT  = ["#5E7684","#F4DFA0","#6E93BD","#FBF6EE","#6FA08F","#94B4E4","#F8EBCB"];
+  const SSTONE = ["#A3A7AC","#C2C3C4","#94999E","#B7AEA6"];
+  const blob = (ctx, cx, cy, rx, ry, r, a0 = 0, a1 = TAU) => {
+    const n = 22; ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const a = a0 + (a1 - a0) * i / n, j = 1 + (r() - 0.5) * 0.14;
+      const x = cx + Math.cos(a) * rx * j, y = cy + Math.sin(a) * ry * j;
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+  };
+  const paint = (ctx, cx, cy, rx, ry, col, seed, a0, a1) => {
+    const r = rng(seed); ctx.fillStyle = col;
+    if (!col.startsWith("rgba")) { blob(ctx, cx, cy, rx * 0.9, ry * 0.9, r, a0, a1); ctx.fill(); }
+    ctx.globalAlpha = 0.5;
+    for (let n = 0; n < 2; n++) { blob(ctx, cx + (r() - 0.5), cy + (r() - 0.5), rx, ry, r, a0, a1); ctx.fill(); }
+    ctx.globalAlpha = 1;
+  };
+  function grain(c) {
+    if (c.grain) return c.grain;
+    const n = document.createElement("canvas"); n.width = n.height = 96;
+    const g = n.getContext("2d"), img = g.createImageData(96, 96), r = rng(42);
+    for (let i = 0; i < img.data.length; i += 4) { const v = 120 + r() * 135; img.data[i] = img.data[i+1] = img.data[i+2] = v; img.data[i+3] = 255; }
+    g.putImageData(img, 0, 0);
+    return (c.grain = n);
+  }
+  function soft(ctx, t, c) {
+    ctx.fillStyle = "#86A9BC"; ctx.fillRect(0, 0, W, H);
+    [[-30,"#9CC0CB"],[-16,"#B9D8D5"],[-6,"#F7F2EA"],[0,"#E6CDB6"],[14,"#F2E1CC"]].forEach(([off, col], i) => {
+      const base = edge(off, i, t);
+      ctx.globalAlpha = 0.5;
+      for (let n = 0; n < 3; n++) { const r = rng(100 + i*10 + n); fillBelow(ctx, base.map(([x, y]) => [x, y + (r() - 0.5) * 2.6]), col); }
+      ctx.globalAlpha = 1;
+    });
+    const r = rng(9); ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+    for (let n = 0; n < 14; n++) { const x = r()*W, y = 6 + r()*40; ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + 9, y - 2, x + 18 + r()*14, y); ctx.stroke(); }
+    for (const [x, y] of scene.steps) paint(ctx, x, y, 2.4, 1.3, "rgba(170,125,100,.45)", x);
+    items.forEach((o, idx) => {
+      if (o.kind === "rock") {
+        paint(ctx, o.x, o.y + 3, o.r*1.05, o.r*0.35, "rgba(120,95,85,.2)", idx + 300);
+        paint(ctx, o.x, o.y, o.r, o.r*0.72, "#9DA3A8", idx + 1);
+        paint(ctx, o.x - o.r*0.25, o.y - o.r*0.22, o.r*0.5, o.r*0.32, "#BCC1C5", idx + 50);
+      } else if (o.kind === "cairn") {
+        at(ctx, o.x, o.y, K, () => {
+          paint(ctx, o.x, o.y + 1, 10, 3, "rgba(120,95,85,.2)", idx + 400);
+          for (const s of cairnStones(o)) paint(ctx, s.x, s.y, s.rx, s.ry, SSTONE[(s.i + o.n) % SSTONE.length], idx*10 + s.i);
+        });
+      } else at(ctx, o.x, o.y, K, () => softPerson(ctx, o, idx));
+    });
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalCompositeOperation = "multiply"; ctx.globalAlpha = 0.09;
+    ctx.fillStyle = ctx.createPattern(grain(c), "repeat"); ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
+  }
+  function softPerson(ctx, p, idx) {
+    const sit = p.act === "sit", rx = 8, ry = sit ? 7 : 10, by = p.y - (sit ? 7 : 11), s = idx * 17;
+    paint(ctx, p.x, p.y + 0.5, 10, 3.2, "rgba(120,95,85,.22)", s);
+    if (p.me) { ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineWidth = 1.1; ctx.setLineDash([2.5, 2]); ctx.beginPath(); ctx.ellipse(p.x, p.y, 13, 4.5, 0, 0, TAU); ctx.stroke(); ctx.setLineDash([]); }
+    if (p.act === "wave") paint(ctx, p.x + rx, by - ry + 2, 2.4, 4.2, SBODY[p.c], s + 1);
+    paint(ctx, p.x, by, rx, ry, SBODY[p.c], s + 2);
+    paint(ctx, p.x + 1.5, by + 3, rx*0.5, ry*0.45, "rgba(255,255,255,.25)", s + 3);
+    paint(ctx, p.x, by - ry + 3, rx*0.8, 4.2, SHAT[p.c], s + 4, Math.PI, TAU);
+    paint(ctx, p.x, by - ry - 1.6, 2, 2, SHAT[p.c], s + 5);
+    if (sit) closedEyes(ctx, p.x, by - 1, "rgba(60,45,55,.85)");
+    else { dot(ctx, p.x - 2.8, by - 1.5, 1, "rgba(60,45,55,.9)"); dot(ctx, p.x + 2.8, by - 1.5, 1, "rgba(60,45,55,.9)"); }
+    paint(ctx, p.x - 4.8, by + 1.4, 1.5, 1.2, "rgba(230,120,120,.35)", s + 6); paint(ctx, p.x + 4.8, by + 1.4, 1.5, 1.2, "rgba(230,120,120,.35)", s + 7);
+    if (p.act === "wave") {
+      ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 1.1; ctx.lineCap = "round";
+      for (const rr of [4, 7]) { ctx.beginPath(); ctx.arc(p.x + rx + 1, by - ry + 1, rr, -1.3, -0.3); ctx.stroke(); }
+    }
+    if (p.act === "stack") paint(ctx, p.x + rx + 2.5, by + 1, 3.4, 2.3, "#A9AEB2", s + 8);
+    if (p.me) youLabel(ctx, p, '600 7px "Figtree", sans-serif');
+  }
+
+  /* C. Pixel: the grid size is picked so each art pixel is a whole number of screen pixels */
+  const SPRITE = ["..HHH..",".HHHHH.",".BBBBB.","BBEBEBB","BBBBBBB","BBBBBBB",".BBBBB.","..F.F.."];
+  const SPRITE_SIT = ["..HHH..",".HHHHH.",".BBBBB.","BBEBEBB","BBBBBBB",".BBBBB."];
+  const shade = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = (v) => Math.max(0, Math.min(255, Math.round(v * k))); return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`; };
+  function pixel(ctx, t, c) {
+    const cw = ctx.canvas.width, chgt = ctx.canvas.height;
+    const k = Math.max(2, Math.round(cw / 112)), pw = Math.ceil(cw / k), ph = Math.ceil(chgt / k), S = pw / W;
+    if (!c.off || c.off.width !== pw || c.off.height !== ph) { c.off = document.createElement("canvas"); c.off.width = pw; c.off.height = ph; }
+    const o = c.off.getContext("2d");
+    const px = (x, y, col, w = 1, h = 1) => { o.fillStyle = col; o.fillRect(Math.round(x), Math.round(y), w, h); };
+    for (let x = 0; x < pw; x++) {
+      const wx = (x + 0.5) / S, e = Math.round(shore(wx, t) * S), e0 = Math.round(shore(wx, 0) * S);
+      const sw = Math.round(Math.sin(t*1.1 + x/8));
+      px(x, 0, "#1F5568", 1, e - 9 + sw);
+      px(x, e - 9 + sw, "#2D7D8E", 1, 4);
+      px(x, e - 5 + sw, "#4CA6A6", 1, 3 - sw);
+      px(x, e - 2, "#E9F4EC", 1, 2);
+      px(x, e, "#CBA978", 1, Math.max(1, e0 + 4 - e));
+      px(x, Math.max(e + 1, e0 + 4), "#E7CD94", 1, ph);
+    }
+    const r = rng(5);
+    for (let n = 0; n < 45; n++) px(r()*pw, ph*0.42 + r()*ph*0.58, "#D6B87D");
+    for (let n = 0; n < 8; n++) px(r()*pw, 1 + r()*ph*0.1, "#2D6B7E", 3, 1);
+    for (const [x, y] of scene.steps) px(x*S, y*S, "#BF9E68");
+    for (const it of items) {
+      const X = Math.round(it.x * S), Y = Math.round(it.y * S);
+      if (it.kind === "rock") {
+        const R = Math.max(2, Math.round(it.r * S));
+        for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++) {
+          if (dx*dx + dy*dy > R*R) continue;
+          px(X + dx, Y + Math.round(dy * 0.72), dy > R*0.4 ? "#56616A" : (dx < 0 && dy < 0 ? "#93A0A2" : "#6F7B7E"));
+        }
+      } else if (it.kind === "cairn") {
+        px(X - 3, Y + 1, "#C4A26E", 7, 1);
+        let y = Y - 1;
+        [6, 5, 4, 3].slice(0, it.n).forEach((w, i) => {
+          const col = STONE[(i + it.n) % STONE.length];
+          px(X - Math.floor(w/2), y, col, w, 2); px(X - Math.floor(w/2), y + 1, shade(col, 0.8), w, 1);
+          y -= 2;
+        });
+      } else {
+        const sp = it.act === "sit" ? SPRITE_SIT : SPRITE, body = BODY[it.c], hat = HAT[it.c];
+        const ox = X - 3, oy = Y - sp.length + 1;
+        px(X - 3, Y + 1, "rgba(120,90,40,.35)", 7, 1);
+        sp.forEach((row, ry) => [...row].forEach((ch, rx) => {
+          if (ch === ".") return;
+          px(ox + rx, oy + ry, ch === "H" ? hat : ch === "E" ? "#1C2328" : ch === "F" ? shade(body, 0.7) : body);
+        }));
+        if (it.act === "wave") { px(ox + 7, oy + 2, body); px(ox + 8, oy + 1, body); px(ox + 9, oy - 1, "#FFFFFF"); px(ox + 10, oy + 1, "#FFFFFF"); }
+        if (it.act === "stack") px(ox + 7, oy + 4, "#9AA3A6", 2, 2);
+        if (it.me) { px(X - 5, Y + 2, "#FFFFFF", 2, 1); px(X + 4, Y + 2, "#FFFFFF", 2, 1); px(X - 1, Y + 3, "#FFFFFF", 3, 1); }
+      }
+    }
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(c.off, 0, 0, pw * k, ph * k);
+  }
+
+  const RENDER = {paper, paint: soft, pixel};
+  const comps = [...document.querySelectorAll(".comp")].map(el => ({el, canvas: el.querySelector("canvas"), style: el.dataset.style, visible: true}));
+  const size = (c) => {
+    const dpr = Math.min(2, window.devicePixelRatio || 1), w = c.el.clientWidth || 400;
+    c.canvas.width = Math.max(1, Math.round(w * dpr)); c.canvas.height = Math.max(1, Math.round(w * 9/16 * dpr));
+  };
+  const draw = (c, t) => {
+    const ctx = c.canvas.getContext("2d"); if (!ctx) return;
+    ctx.setTransform(c.canvas.width / W, 0, 0, c.canvas.height / H, 0, 0);
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+    try { RENDER[c.style](ctx, t, c); } catch (e) { console.error(e); }
+  };
+  let now = 0;
+  comps.forEach(c => { size(c); draw(c, 0); });
+  if ("ResizeObserver" in window) comps.forEach(c => new ResizeObserver(() => { size(c); draw(c, now); }).observe(c.el));
+  if ("IntersectionObserver" in window) comps.forEach(c => new IntersectionObserver(([e]) => { c.visible = e.isIntersecting; }).observe(c.el));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => comps.forEach(c => draw(c, now)));
+
+  const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!still) {
+    let last = 0;
+    const frame = (ms) => {
+      if (ms - last > 50) { last = ms; now = ms / 1000; comps.forEach(c => { if (c.visible) draw(c, now); }); }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
+  let secs = 372;
+  setInterval(() => {
+    secs = secs > 0 ? secs - 1 : 900;
+    const label = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+    document.querySelectorAll(".tide-time").forEach(el => { el.textContent = label; });
+  }, 1000);
+})();
+</script>
