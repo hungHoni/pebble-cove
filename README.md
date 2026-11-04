@@ -8,8 +8,9 @@ Pebble Cove is a working title. Step 1 is built: one beach for one player. Every
 
 ## Play it
 
-- **Game:** <https://claude.ai/artifact/U8xbxw6mAiFex1YdHiKqpK>. It's private: you need to be signed in to claude.ai, and other people can open it only after you share it from the page's Share menu. Add `#tide-60.stats` to the end for one-minute tides and the speed box.
-- **Code:** <https://github.com/hungHoni/pebble-cove>, a private repository.
+- **Game:** <https://hunghoni.github.io/pebble-cove/>. It's public: anyone with the link can play, with no sign-in. Add `?tide=60&stats` to the end for one-minute tides and the speed box. Every push to `main` builds the game, runs the tests and publishes it there, through `.github/workflows/pages.yml`.
+- **Code:** <https://github.com/hungHoni/pebble-cove>, a public repository.
+- **Private copy:** <https://claude.ai/artifact/U8xbxw6mAiFex1YdHiKqpK>, which needs a claude.ai sign-in and doesn't update on push. Add `#tide-60.stats` there instead.
 
 ## What's here
 
@@ -21,6 +22,7 @@ Pebble Cove is a working title. Step 1 is built: one beach for one player. Every
 | `design/pebble-cove.html` | Source of the design page: looks, a visit, wow ideas, why people come back, multiplayer setup, costs, funding, marketing and the build plan | Draft 10, published |
 | `mockups/` | Stills of the design looks and of step 1 running | Reference |
 | `scripts/build-artifact.mjs` | Turns the build into the claude.ai link's files | Used by `npm run artifact` |
+| `.github/workflows/pages.yml` | Builds, tests and publishes the game to GitHub Pages on every push to `main` | Live |
 
 The published design page is at <https://claude.ai/artifact/BB4UnxniTuGm88Y4mtEpwn>. It's private until you share it. To change it, edit `design/pebble-cove.html` and publish it to that same link.
 
@@ -48,7 +50,7 @@ npm run build
 npm run phone
 ```
 
-This builds the game and serves it to every device on your Wi-Fi, on port 5182. Open the Network address it prints in Safari on your iPhone, for example `http://192.168.1.126:5182/?stats`. Your iPhone has to be on the same Wi-Fi as the Mac. Anyone else on that Wi-Fi can open it too while it runs. Press Ctrl+C to stop it.
+This builds the game and serves it to every device on your Wi-Fi, on port 5182. Open the Network address it prints in Safari on your iPhone, for example `http://192.168.1.20:5182/?stats`. To test without the Mac, open <https://hunghoni.github.io/pebble-cove/?stats> instead. Your iPhone has to be on the same Wi-Fi as the Mac. Anyone else on that Wi-Fi can open it too while it runs. Press Ctrl+C to stop it.
 
 Before you start:
 
@@ -95,7 +97,7 @@ Checked so far, in headless Chrome at desktop size, as an upright phone (390 × 
 Not checked yet:
 
 - Frame rate in Safari on your iPhone, and on an older iPhone.
-- Load time on 4G.
+- Load time on 4G. The public link now makes this easy to try away from the Wi-Fi.
 - Sound on a real device.
 - Five new players each playing one tide.
 - A play-test robot run on the iPhone. The hook is ready, but the runner in `../playtest-harness` isn't built yet.
